@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Solutions - Karthik Corp</title>
+  <link rel="stylesheet" href="brand-template.css">
+</head>
+<body class="brand-body">
+  <header class="brand-header">
+    <div class="container">
+      <a class="logo" href="index.html">Karthik <span>The Brand</span></a>
+      <nav class="nav">
+        <a href="products.html">Products</a>
+        <a href="solutions.html">Solutions</a>
+        <a class="btn" href="about.html">About</a>
+        </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <h1>We make bold products for brighter businesses.</h1>
+        <p class="lead">Brand-driven design, engineering excellence, and service you can count on.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="get-started.html">Get Started</a>
+          <a class="btn btn-ghost" href="view-catalog.html">View Catalog</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="features container">
+      <article class="card">
+        <h3>Design-forward</h3>
+        <p>Beautiful interfaces and thoughtful UX that customers love.</p>
+        <a href="design-forward.html" class="link">Learn more →</a>
+      </article>
+      <article class="card">
+        <h3>Built for scale</h3>
+        <p>Infrastructure and engineering that grow with your business.</p>
+        <a href="built-for-scale.html" class="link">See details →</a>
+      </article>
+      <article class="card">
+        <h3>Trusted support</h3>
+        <p>24/7 support and dedicated account managers for enterprise clients.</p>
+        <a href="contact.html" class="link">Contact sales →</a>
+      </article>
+    </section>
+
+    <section class="showcase">
+      <div class="container">
+        <h2>Featured product</h2>
+        <div class="showcase-grid">
+          <div class="showcase-image"></div>
+          <div>
+            <h3>Brand Analytics</h3>
+            <p>Powerful analytics to help you make smarter decisions. Includes dashboards, alerts and team collaboration.</p>
+            <a class="btn btn-primary" href="request-demo.html">Request Demo</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="brand-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>Karthik Corp Co.</h4>
+        <p>© <span id="year"></span> Karthik Corporation. All rights reserved.</p>
+      </div>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="careers.html">Careers</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    function animateProducts() {
+      const productCards = document.querySelectorAll('.card');
+      productCards.forEach((card, index) => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'opacity 0.5s, transform 0.5s';
+          card.style.opacity = 1;
+          card.style.transform = 'translateY(0)';
+        }, index * 100); // Stagger animation
+      });
+    }
+
+    // Load and animate products
+    fetchProducts().then(animateProducts);
+  </script>
+</body>
+</html>

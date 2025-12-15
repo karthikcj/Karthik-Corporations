@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Checkout - Karthik Corp</title>
+  <link rel="stylesheet" href="brand-template.css">
+</head>
+<body class="brand-body">
+  <header class="brand-header">
+    <div class="container">
+      <a class="logo" href="index.html">Karthik <span>The Brand</span></a>
+      <nav class="nav">
+        <a href="products.html">Products</a>
+        <a href="solutions.html">Solutions</a>
+        <a class="btn" href="about.html">About</a>
+        <a class="cart-link" href="checkout.html">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-badge" id="cart-badge">0</span>
+          <span class="cart-total" id="cart-total">₹0.00</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="checkout-container">
+      <div class="checkout-header">
+        <h1>Checkout</h1>
+      </div>
+
+      <div id="cart-summary" class="cart-summary">
+        <!-- Cart items will be loaded here -->
+      </div>
+
+      <div id="bill-display" style="display:none;">
+        <!-- Bill will be displayed here -->
+      </div>
+
+      <!-- QR Code Payment Modal -->
+      <div id="qr-payment-modal" class="qr-modal" style="display:none;">
+        <div class="qr-modal-content">
+          <span class="qr-close" onclick="closeQRPayment()">&times;</span>
+          <h2>Scan QR Code to Pay</h2>
+          <div class="qr-code-container">
+            <div id="qr-code"></div>
+            <p style="text-align:center; margin-top:20px; font-weight:600;" id="qr-amount"></p>
+            <p style="text-align:center; color:var(--muted); font-size:14px; margin-top:10px;">
+              Scan this QR code with your UPI/Payment app to complete the payment
+            </p>
+            <div class="payment-status" id="payment-status" style="display:none;">
+              <p style="color:var(--brand-accent); text-align:center; margin-top:20px;">
+                ✓ Payment Processing...
+              </p>
+            </div>
+            <div class="checkout-actions" style="margin-top:30px;">
+              <button class="btn btn-primary" onclick="confirmPayment()">Confirm Payment</button>
+              <button class="btn btn-ghost" onclick="closeQRPayment()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="brand-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>Karthik Corp Co.</h4>
+        <p>© <span id="year"></span> Karthik Corporation. All rights reserved.</p>
+      </div>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="careers.html">Careers</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/storage-manager.js"></script>
+  <script src="js/cart-manager.js"></script>
+  <script src="js/currency-converter.js"></script>
+  <script src="js/bill-generator.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Load and display cart
+    function loadCart() {
+      const cart = StorageManager.getCart();
+      const cartSummary = document.getElementById('cart-summary');
+      const billDisplay = document.getElementById('bill-display');
+
+      if (!cart.items || cart.items.length === 0) {
+        cartSummary.innerHTML = `
+          <div class="empty-cart">
+            <h2>Your cart is empty</h2>
+            <p>Add some products to your cart to continue.</p>
+            <a href="products.html" class="btn btn-primary" style="margin-top:20px; display:inline-block;">Continue Shopping</a>
+          </div>
+        `;
+        billDisplay.style.display = 'none';
+        return;
+      }
+
+      // Display cart items
+      let cartHTML = '<h2>Cart Items</h2>';
+      
+      cart.items.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        cartHTML += `
+          <div class="cart-item">
+            <img src="${item.image || 'https://via.placeholder.com/80'}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/80'">
+            <div class="cart-item-info">
+              <h3 class="cart-item-name">${item.name}</h3>
+              <p class="cart-item-price">${typeof CurrencyConverter !== 'undefined' ? CurrencyConverter.formatUSDToINR(item.price) : '$' + item.price.toFixed(2)} each</p>
+            </div>
+            <div class="cart-item-quantity">
+              <button class="quantity-btn" onclick="updateQuantity('${item.productId}', ${item.quantity - 1})">-</button>
+              <input type="number" class="quantity-input" value="${item.quantity}" min="1" 
+                     onchange="updateQuantity('${item.productId}', parseInt(this.value))">
+              <button class="quantity-btn" onclick="updateQuantity('${item.productId}', ${item.quantity + 1})">+</button>
+            </div>
+            <div class="cart-item-total">${typeof CurrencyConverter !== 'undefined' ? CurrencyConverter.formatUSDToINR(itemTotal) : '$' + itemTotal.toFixed(2)}</div>
+            <button class="btn btn-danger" onclick="removeItem('${item.productId}')" style="padding:8px 12px; font-size:12px;">Remove</button>
+          </div>
+        `;
+      });
+
+      // Calculate totals
+      const subtotal = cart.total;
+      const tax = subtotal * 0.1; // 10% tax
+      const grandTotal = subtotal + tax;
+      const subtotalINR = typeof CurrencyConverter !== 'undefined' ? CurrencyConverter.getINR(subtotal) : subtotal;
+      const taxINR = typeof CurrencyConverter !== 'undefined' ? CurrencyConverter.getINR(tax) : tax;
+      const grandTotalINR = typeof CurrencyConverter !== 'undefined' ? CurrencyConverter.getINR(grandTotal) : grandTotal;
+
+      cartHTML += `
+        <div class="cart-totals">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <span>${typeof CurrencyConverter !== 'undefined' ? CurrencyConverter.formatINR(subtotalINR) : '$' + subtotal.toFixed(2)}</span>
+          </div>
+          <div class="total-row">
+            <span>Tax (10%):</span>
+            <span>${typeof CurrencyConverter !== 'undefined' ? CurrencyConverter.formatINR(taxINR) : '$' + tax.toFixed(2)}</span>
+          </div>
+          <div class="total-row grand-total">
+            <span>Grand Total:</span>
+            <span>${typeof CurrencyConverter !== 'undefined' ? CurrencyConverter.formatINR(grandTotalINR) : '$' + grandTotal.toFixed(2)}</span>
+          </div>
+        </div>
+        <div class="checkout-actions">
+          <button class="btn btn-primary" onclick="showQRPayment(${grandTotalINR})">Pay via QR Code</button>
+          <button class="btn btn-primary" onclick="generateBill()">Generate Bill</button>
+          <button class="btn btn-ghost" onclick="clearCart()">Clear Cart</button>
+          <a href="products.html" class="btn btn-ghost">Continue Shopping</a>
+        </div>
+      `;
+
+      cartSummary.innerHTML = cartHTML;
+    }
+
+    // Update quantity
+    function updateQuantity(productId, quantity) {
+      CartManager.updateQuantity(productId, quantity);
+      loadCart();
+      CartManager.updateCartUI();
+    }
+
+    // Remove item
+    function removeItem(productId) {
+      if (confirm('Are you sure you want to remove this item?')) {
+        CartManager.removeItem(productId);
+        loadCart();
+        CartManager.updateCartUI();
+      }
+    }
+
+    // Generate bill
+    function generateBill() {
+      const cart = StorageManager.getCart();
+      const billHTML = BillGenerator.generateBillHTML(cart);
+      const billDisplay = document.getElementById('bill-display');
+      const cartSummary = document.getElementById('cart-summary');
+
+      billDisplay.innerHTML = billHTML;
+      billDisplay.style.display = 'block';
+      cartSummary.style.display = 'none';
+
+      // Scroll to bill
+      billDisplay.scrollIntoView({ behavior: 'smooth' });
+
+      // Add print/download buttons
+      const actionsHTML = `
+        <div class="checkout-actions" style="margin-top:20px;">
+          <button class="btn btn-primary" onclick="printBill()">Print Bill</button>
+          <button class="btn btn-ghost" onclick="downloadBill()">Download PDF</button>
+          <button class="btn btn-ghost" onclick="backToCart()">Back to Cart</button>
+          <button class="btn btn-danger" onclick="clearCartAndReset()">Clear Cart & Reset</button>
+        </div>
+      `;
+      billDisplay.insertAdjacentHTML('beforeend', actionsHTML);
+    }
+
+    // Print bill
+    function printBill() {
+      const cart = StorageManager.getCart();
+      BillGenerator.printBill(cart);
+    }
+
+    // Download bill
+    function downloadBill() {
+      const cart = StorageManager.getCart();
+      BillGenerator.downloadBill(cart);
+    }
+
+    // Back to cart
+    function backToCart() {
+      const billDisplay = document.getElementById('bill-display');
+      const cartSummary = document.getElementById('cart-summary');
+      billDisplay.style.display = 'none';
+      cartSummary.style.display = 'block';
+      billDisplay.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Clear cart and reset
+    function clearCartAndReset() {
+      if (confirm('Are you sure you want to clear the cart? This will remove all items.')) {
+        CartManager.clearCart();
+        loadCart();
+        CartManager.updateCartUI();
+        const billDisplay = document.getElementById('bill-display');
+        billDisplay.style.display = 'none';
+        const cartSummary = document.getElementById('cart-summary');
+        cartSummary.style.display = 'block';
+      }
+    }
+
+    // Clear cart
+    function clearCart() {
+      if (confirm('Are you sure you want to clear the cart?')) {
+        CartManager.clearCart();
+        loadCart();
+        CartManager.updateCartUI();
+      }
+    }
+
+    // Show QR Payment
+    function showQRPayment(amountINR) {
+      const modal = document.getElementById('qr-payment-modal');
+      const qrCodeDiv = document.getElementById('qr-code');
+      const amountDisplay = document.getElementById('qr-amount');
+      
+      // Generate UPI payment link
+      const upiId = 'karthikcorp@paytm'; // Replace with actual UPI ID
+      const paymentAmount = amountINR.toFixed(2);
+      const paymentNote = 'Payment for Karthik Corp';
+      const upiLink = `upi://pay?pa=${upiId}&am=${paymentAmount}&tn=${encodeURIComponent(paymentNote)}&cu=INR`;
+      
+      // Generate QR code using a QR code API (using qr-server.com)
+      const qrCodeURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
+      
+      qrCodeDiv.innerHTML = `<img src="${qrCodeURL}" alt="QR Code" style="max-width:100%; height:auto;">`;
+      amountDisplay.textContent = `Amount: ${CurrencyConverter.formatINR(amountINR)}`;
+      
+      modal.style.display = 'block';
+    }
+
+    // Close QR Payment
+    function closeQRPayment() {
+      document.getElementById('qr-payment-modal').style.display = 'none';
+    }
+
+    // Confirm Payment
+    function confirmPayment() {
+      const statusDiv = document.getElementById('payment-status');
+      statusDiv.style.display = 'block';
+      
+      // Simulate payment processing
+      setTimeout(() => {
+        alert('Payment confirmed! Generating bill...');
+        closeQRPayment();
+        generateBill();
+      }, 1500);
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('qr-payment-modal');
+      if (event.target === modal) {
+        closeQRPayment();
+      }
+    }
+
+    // Initialize
+    CartManager.updateCartUI();
+    loadCart();
+  </script>
+</body>
+</html>
+

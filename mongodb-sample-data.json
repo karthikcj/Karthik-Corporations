@@ -1,0 +1,119 @@
+{
+  "database": "brandDB",
+  "collections": {
+    "products": [
+      {
+        "_id": "prod_hdd_001",
+        "name": "HDD",
+        "description": "High-capacity Hard Disk Drive for reliable data storage",
+        "price": 89.99,
+        "image": "https://images.unsplash.com/photo-1587831990716-53e7f8c6c77a?w=400&h=300&fit=crop",
+        "category": "Storage",
+        "id": "prod_hdd_001"
+      },
+      {
+        "_id": "prod_ram_001",
+        "name": "RAM",
+        "description": "High-performance Random Access Memory for faster computing",
+        "price": 129.99,
+        "image": "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=300&fit=crop",
+        "category": "Memory",
+        "id": "prod_ram_001"
+      },
+      {
+        "_id": "prod_nic_001",
+        "name": "Network NIC Cards",
+        "description": "Network Interface Card for high-speed network connectivity",
+        "price": 45.99,
+        "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=300&fit=crop",
+        "category": "Networking",
+        "id": "prod_nic_001"
+      },
+      {
+        "_id": "prod_switch_001",
+        "name": "Network Switches (10 port)",
+        "description": "10-port network switch for efficient network management",
+        "price": 159.99,
+        "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=300&fit=crop",
+        "category": "Networking",
+        "id": "prod_switch_001"
+      },
+      {
+        "_id": "prod_cable_3m",
+        "name": "Shield Lan-Cables (3M)",
+        "description": "3-meter shielded LAN cable for reliable network connections",
+        "price": 12.99,
+        "image": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop",
+        "category": "Cables",
+        "id": "prod_cable_3m"
+      },
+      {
+        "_id": "prod_cable_5m",
+        "name": "Shield Lan-Cables (5M)",
+        "description": "5-meter shielded LAN cable for extended network connections",
+        "price": 18.99,
+        "image": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop",
+        "category": "Cables",
+        "id": "prod_cable_5m"
+      }
+    ],
+    "admins": [
+      {
+        "_id": "admin_001",
+        "userid": "admin",
+        "password": "$2a$10$rOzJqKqKqKqKqKqKqKqKqOqKqKqKqKqKqKqKqKqKqKqKqKqKqKqKqKq",
+        "createdAt": "2024-01-01T00:00:00.000Z"
+      },
+      {
+        "_id": "admin_002",
+        "userid": "karthik",
+        "password": "$2a$10$rOzJqKqKqKqKqKqKqKqKqOqKqKqKqKqKqKqKqKqKqKqKqKqKqKqKqKq",
+        "createdAt": "2024-01-01T00:00:00.000Z"
+      }
+    ],
+    "demorequests": [
+      {
+        "_id": "demo_001",
+        "name": "John Doe",
+        "phone": "+91 9876543210",
+        "email": "john.doe@example.com",
+        "address": "123 Main Street, Bangalore, Karnataka 560001, India",
+        "reason": "Interested in learning more about your network solutions for our office setup.",
+        "createdAt": "2024-01-15T10:30:00.000Z",
+        "status": "pending"
+      },
+      {
+        "_id": "demo_002",
+        "name": "Jane Smith",
+        "phone": "+91 9876543211",
+        "email": "jane.smith@example.com",
+        "address": "456 Tech Park, Mumbai, Maharashtra 400001, India",
+        "reason": "Looking for storage solutions for our data center expansion project.",
+        "createdAt": "2024-01-16T14:20:00.000Z",
+        "status": "pending"
+      }
+    ]
+  },
+  "instructions": {
+    "import_to_mongodb": [
+      "1. Make sure MongoDB is running on localhost:27017",
+      "2. Connect to MongoDB: mongosh",
+      "3. Use the database: use brandDB",
+      "4. Import products:",
+      "   db.products.insertMany([...products array from above...])",
+      "5. Import admins:",
+      "   db.admins.insertMany([...admins array from above...])",
+      "6. Import demo requests:",
+      "   db.demorequests.insertMany([...demorequests array from above...])",
+      "",
+      "Note: For admin passwords, use bcrypt hashed passwords in production.",
+      "For testing, you can use plain text passwords by modifying server.js"
+    ],
+    "default_admin_credentials": {
+      "userid": "admin",
+      "password": "admin123",
+      "note": "Change these credentials in production!"
+    }
+  }
+}
+

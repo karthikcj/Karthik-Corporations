@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Karthik Corp</title>
+  <link rel="stylesheet" href="brand-template.css">
+</head>
+<body class="brand-body">
+  <header class="brand-header">
+    <div class="container">
+      <a class="logo" href="index.html">Karthik <span>The Brand</span></a>
+      <nav class="nav">
+        <a href="products.html">Products</a>
+        <a href="solutions.html">Solutions</a>
+        <a class="btn" href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <!-- Login Form -->
+    <div id="login-section" class="admin-container">
+      <div class="admin-section" style="max-width:400px; margin:60px auto;">
+        <h2>Admin Login</h2>
+        <form id="login-form" class="admin-form">
+          <div class="form-group">
+            <label for="userid">User ID *</label>
+            <input type="text" id="userid" name="userid" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+          <div id="login-error" style="color:#ef4444; margin-top:10px; display:none;"></div>
+        </form>
+        <p style="text-align:center; margin-top:20px; color:var(--muted); font-size:14px;">
+          Don't have an account? <a href="#" onclick="showRegister()" style="color:var(--brand-primary);">Register</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Admin Panel (shown after login) -->
+    <div id="admin-panel" class="admin-container" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1>Admin Panel - Product Management</h1>
+        <button class="btn btn-ghost" onclick="logout()">Logout</button>
+      </div>
+
+      <!-- Add Product Form -->
+      <div class="admin-section">
+        <h2>Add New Product</h2>
+        <form id="add-product-form" class="admin-form">
+          <div class="form-group">
+            <label for="product-name">Product Name *</label>
+            <input type="text" id="product-name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="product-description">Description *</label>
+            <textarea id="product-description" name="description" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="product-price">Price (USD) * <small style="color:var(--muted);">(Will be converted to ₹)</small></label>
+            <input type="number" id="product-price" name="price" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label for="product-image">Image URL *</label>
+            <input type="url" id="product-image" name="image" required placeholder="https://example.com/image.jpg">
+          </div>
+          <div class="form-group">
+            <label for="product-category">Category</label>
+            <input type="text" id="product-category" name="category" placeholder="e.g., Storage, Memory, Networking">
+          </div>
+          <button type="submit" class="btn btn-primary">Add Product</button>
+        </form>
+      </div>
+
+      <!-- Existing Products List -->
+      <div class="admin-section">
+        <h2>Existing Products</h2>
+        <div id="products-list" class="admin-products-list">
+          <!-- Products will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="brand-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>Karthik Corp Co.</h4>
+        <p>© <span id="year"></span> Karthik Corporation. All rights reserved.</p>
+      </div>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="careers.html">Careers</a>
+        <a href="products.html">Back to Products</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/storage-manager.js"></script>
+  <script src="js/product-manager.js"></script>
+  <script src="js/auth-manager.js"></script>
+  <script src="js/currency-converter.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Check authentication on load
+    if (AuthManager.isAuthenticated()) {
+      showAdminPanel();
+    } else {
+      showLogin();
+    }
+
+    // Show login form
+    function showLogin() {
+      document.getElementById('login-section').style.display = 'block';
+      document.getElementById('admin-panel').style.display = 'none';
+    }
+
+    // Show admin panel
+    function showAdminPanel() {
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      loadProducts();
+    }
+
+    let isRegisterMode = false;
+
+    // Show register form
+    function showRegister() {
+      const form = document.getElementById('login-form');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const errorDiv = document.getElementById('login-error');
+      
+      if (!isRegisterMode) {
+        isRegisterMode = true;
+        submitBtn.textContent = 'Register';
+        form.querySelector('label[for="userid"]').textContent = 'User ID (for registration) *';
+        errorDiv.textContent = 'Register a new admin account';
+        errorDiv.style.display = 'block';
+        errorDiv.style.color = 'var(--brand-primary)';
+      } else {
+        isRegisterMode = false;
+        submitBtn.textContent = 'Login';
+        form.querySelector('label[for="userid"]').textContent = 'User ID *';
+        errorDiv.style.display = 'none';
+      }
+    }
+
+    // Handle form submission (login or register)
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const userid = document.getElementById('userid').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('login-error');
+      
+      errorDiv.style.display = 'none';
+      
+      if (isRegisterMode) {
+        // Handle registration
+        const result = await AuthManager.register(userid, password);
+        
+        if (result.success) {
+          errorDiv.textContent = 'Registration successful! Please login.';
+          errorDiv.style.display = 'block';
+          errorDiv.style.color = 'var(--brand-accent)';
+          showRegister(); // Switch back to login mode
+          this.reset();
+        } else {
+          errorDiv.textContent = result.message;
+          errorDiv.style.display = 'block';
+          errorDiv.style.color = '#ef4444';
+        }
+      } else {
+        // Handle login
+        const result = await AuthManager.login(userid, password);
+        
+        if (result.success) {
+          showAdminPanel();
+        } else {
+          errorDiv.textContent = result.message;
+          errorDiv.style.display = 'block';
+          errorDiv.style.color = '#ef4444';
+        }
+      }
+    });
+
+    // Logout
+    function logout() {
+      AuthManager.logout();
+      showLogin();
+      document.getElementById('login-form').reset();
+    }
+
+    // Load and display products
+    async function loadProducts() {
+      const products = await ProductManager.initializeProducts();
+      const productsList = document.getElementById('products-list');
+
+      if (!products || products.length === 0) {
+        productsList.innerHTML = '<p>No products found. Add your first product above.</p>';
+        return;
+      }
+
+      productsList.innerHTML = products.map(product => `
+        <div class="admin-product-item">
+          <img src="${product.image || 'https://via.placeholder.com/80'}" alt="${product.name}" 
+               class="admin-product-image" onerror="this.src='https://via.placeholder.com/80'">
+          <div class="admin-product-info">
+            <h3>${product.name}</h3>
+            <p style="color:var(--muted); font-size:14px; margin:5px 0;">${product.description}</p>
+            <p style="color:var(--brand-primary); font-weight:700; margin:5px 0;">${CurrencyConverter.formatUSDToINR(product.price)}</p>
+            ${product.category ? `<p style="color:var(--muted); font-size:12px;">Category: ${product.category}</p>` : ''}
+          </div>
+          <div class="admin-product-actions">
+            <button class="btn btn-danger" onclick="deleteProduct('${product.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Handle form submission
+    document.getElementById('add-product-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const productData = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        price: parseFloat(formData.get('price')),
+        image: formData.get('image'),
+        category: formData.get('category') || 'General'
+      };
+
+      try {
+        const newProduct = await ProductManager.addProduct(productData);
+        if (newProduct) {
+          alert('Product added successfully!');
+          this.reset();
+          loadProducts();
+        } else {
+          alert('Error adding product. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error adding product:', error);
+        alert('Error adding product. Please try again.');
+      }
+    });
+
+    // Delete product
+    async function deleteProduct(productId) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        try {
+          const success = await ProductManager.deleteProduct(productId);
+          if (success) {
+            alert('Product deleted successfully!');
+            loadProducts();
+          } else {
+            alert('Error deleting product. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error deleting product:', error);
+          alert('Error deleting product. Please try again.');
+        }
+      }
+    }
+
+    // Initialize
+    loadProducts();
+  </script>
+</body>
+</html>
+
