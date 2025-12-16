@@ -80,11 +80,27 @@
   <script src="js/cart-manager.js"></script>
   <script src="js/currency-converter.js"></script>
   <script src="js/bill-generator.js"></script>
+  <script src="js/user-manager.js"></script>
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    // Check authentication on page load
+    if (!UserManager.isAuthenticated()) {
+      document.getElementById('cart-summary').innerHTML = `
+        <div class="empty-cart">
+          <h2>Login Required</h2>
+          <p>Please login to your account to proceed with checkout.</p>
+          <a href="users.html" class="btn btn-primary" style="margin-top:20px; display:inline-block;">Login or Register</a>
+        </div>
+      `;
+    }
+
     // Load and display cart
     function loadCart() {
+      // Check if user is authenticated
+      if (!UserManager.isAuthenticated()) {
+        return;
+      }
       const cart = StorageManager.getCart();
       const cartSummary = document.getElementById('cart-summary');
       const billDisplay = document.getElementById('bill-display');

@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Accounts - Karthik Corp</title>
+  <link rel="stylesheet" href="brand-template.css">
+  <style>
+    .user-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .user-section {
+      background: linear-gradient(180deg, #fff, #fbfdff);
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(15,23,36,0.06);
+      border: 1px solid rgba(11,114,255,0.04);
+      margin-bottom: 30px;
+    }
+    .user-section h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--brand-dark);
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid rgba(11,114,255,0.12);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: var(--font-sans);
+    }
+    .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(11,114,255,0.12);
+    }
+    .auth-tab {
+      padding: 10px 20px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      margin-bottom: -2px;
+    }
+    .auth-tab.active {
+      color: var(--brand-primary);
+      border-bottom-color: var(--brand-primary);
+    }
+    .auth-content {
+      display: none;
+    }
+    .auth-content.active {
+      display: block;
+    }
+    .user-list {
+      display: grid;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .user-item {
+      background: var(--surface);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(11,114,255,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-item-info h4 {
+      margin: 0 0 5px 0;
+      color: var(--brand-dark);
+    }
+    .user-item-info p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .profile-display {
+      background: var(--surface);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .profile-field {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(11,114,255,0.08);
+    }
+    .profile-field:last-child {
+      border-bottom: none;
+    }
+    .profile-field strong {
+      color: var(--brand-dark);
+    }
+    .profile-field span {
+      color: var(--muted);
+    }
+    .error-message {
+      color: #ef4444;
+      margin-top: 10px;
+      display: none;
+    }
+    .success-message {
+      color: var(--brand-accent);
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body class="brand-body">
+  <header class="brand-header">
+    <div class="container">
+      <a class="logo" href="index.html">Karthik <span>The Brand</span></a>
+      <nav class="nav">
+        <a href="products.html">Products</a>
+        <a href="solutions.html">Solutions</a>
+        <a class="btn" href="about.html">About</a>
+        <a class="cart-link" href="checkout.html">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-badge" id="cart-badge">0</span>
+          <span class="cart-total" id="cart-total">₹0.00</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="user-container">
+      <!-- Authentication Section -->
+      <div id="auth-section" class="user-section">
+        <h2>User Account</h2>
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+          <button class="auth-tab" onclick="switchTab('register')">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-content" class="auth-content active">
+          <form id="login-form" class="admin-form">
+            <div class="form-group">
+              <label for="login-username">Username *</label>
+              <input type="text" id="login-username" name="username" required>
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password *</label>
+              <input type="password" id="login-password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+            <div id="login-error" class="error-message"></div>
+          </form>
+        </div>
+
+        <!-- Registration Form -->
+        <div id="register-content" class="auth-content">
+          <form id="register-form" class="admin-form">
+            <div class="form-group">
+              <label for="reg-username">Username *</label>
+              <input type="text" id="reg-username" name="username" required>
+            </div>
+            <div class="form-group">
+              <label for="reg-password">Password *</label>
+              <input type="password" id="reg-password" name="password" required>
+            </div>
+            <div class="form-group">
+              <label for="reg-fullname">Full Name</label>
+              <input type="text" id="reg-fullname" name="fullName">
+            </div>
+            <div class="form-group">
+              <label for="reg-email">Email</label>
+              <input type="email" id="reg-email" name="email">
+            </div>
+            <div class="form-group">
+              <label for="reg-phone">Phone Number</label>
+              <input type="tel" id="reg-phone" name="phoneNumber">
+            </div>
+            <div class="form-group">
+              <label for="reg-delivery">Delivery Address</label>
+              <textarea id="reg-delivery" name="deliveryAddress"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="reg-permanent">Permanent Address</label>
+              <textarea id="reg-permanent" name="permanentAddress"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+            <div id="register-error" class="error-message"></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Profile Management Section (shown when logged in) -->
+      <div id="profile-section" class="user-section" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2>My Profile</h2>
+          <button class="btn btn-ghost" onclick="logout()">Logout</button>
+        </div>
+        
+        <div id="profile-display" class="profile-display">
+          <!-- Profile will be displayed here -->
+        </div>
+
+        <button class="btn btn-primary" onclick="toggleEditProfile()" id="edit-profile-btn" style="margin-top:20px;">Edit Profile</button>
+
+        <form id="profile-edit-form" style="display:none; margin-top:20px;">
+          <div class="form-group">
+            <label for="edit-username">Username *</label>
+            <input type="text" id="edit-username" name="username" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-password">New Password (leave blank to keep current)</label>
+            <input type="password" id="edit-password" name="password">
+          </div>
+          <div class="form-group">
+            <label for="edit-fullname">Full Name</label>
+            <input type="text" id="edit-fullname" name="fullName">
+          </div>
+          <div class="form-group">
+            <label for="edit-email">Email</label>
+            <input type="email" id="edit-email" name="email">
+          </div>
+          <div class="form-group">
+            <label for="edit-phone">Phone Number</label>
+            <input type="tel" id="edit-phone" name="phoneNumber">
+          </div>
+          <div class="form-group">
+            <label for="edit-delivery">Delivery Address</label>
+            <textarea id="edit-delivery" name="deliveryAddress"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="edit-permanent">Permanent Address</label>
+            <textarea id="edit-permanent" name="permanentAddress"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn btn-ghost" onclick="toggleEditProfile()">Cancel</button>
+          <div id="profile-error" class="error-message"></div>
+          <div id="profile-success" class="success-message"></div>
+        </form>
+      </div>
+
+      <!-- Admin Section - All Users (shown only to admin) -->
+      <div id="admin-users-section" class="user-section" style="display:none;">
+        <h2>All Users (Admin)</h2>
+        <div id="users-list" class="user-list">
+          <!-- Users will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="brand-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>Karthik Corp Co.</h4>
+        <p>© <span id="year"></span> Karthik Corporation. All rights reserved.</p>
+      </div>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="careers.html">Careers</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/storage-manager.js"></script>
+  <script src="js/cart-manager.js"></script>
+  <script src="js/user-manager.js"></script>
+  <script src="js/auth-manager.js"></script>
+  <script src="js/currency-converter.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Initialize cart UI
+    if (typeof CartManager !== 'undefined') {
+      CartManager.updateCartUI();
+    }
+
+    // Check if user is already logged in
+    if (UserManager.isAuthenticated()) {
+      showProfileSection();
+    } else {
+      document.getElementById('auth-section').style.display = 'block';
+    }
+
+    // Check if admin is logged in
+    if (AuthManager.isAuthenticated()) {
+      loadAllUsers();
+    }
+
+    // Tab switching
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-content').forEach(c => c.classList.remove('active'));
+      
+      if (tab === 'login') {
+        document.querySelector('.auth-tab').classList.add('active');
+        document.getElementById('login-content').classList.add('active');
+      } else {
+        document.querySelectorAll('.auth-tab')[1].classList.add('active');
+        document.getElementById('register-content').classList.add('active');
+      }
+    }
+
+    // Login form submission
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+      const errorDiv = document.getElementById('login-error');
+
+      errorDiv.style.display = 'none';
+
+      const result = await UserManager.login(username, password);
+
+      if (result.success) {
+        showProfileSection();
+        this.reset();
+      } else {
+        errorDiv.textContent = result.message;
+        errorDiv.style.display = 'block';
+      }
+    });
+
+    // Registration form submission
+    document.getElementById('register-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const userData = {
+        username: formData.get('username'),
+        password: formData.get('password'),
+        fullName: formData.get('fullName'),
+        email: formData.get('email'),
+        phoneNumber: formData.get('phoneNumber'),
+        deliveryAddress: formData.get('deliveryAddress'),
+        permanentAddress: formData.get('permanentAddress')
+      };
+      const errorDiv = document.getElementById('register-error');
+
+      errorDiv.style.display = 'none';
+
+      const result = await UserManager.register(userData);
+
+      if (result.success) {
+        showProfileSection();
+        this.reset();
+        switchTab('login');
+      } else {
+        errorDiv.textContent = result.message;
+        errorDiv.style.display = 'block';
+      }
+    });
+
+    // Show profile section
+    async function showProfileSection() {
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('profile-section').style.display = 'block';
+      await loadProfile();
+    }
+
+    // Load profile
+    async function loadProfile() {
+      const username = UserManager.getCurrentUsername();
+      if (!username) return;
+
+      try {
+        const profile = await UserManager.getProfile(username);
+        displayProfile(profile);
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
+    // Display profile
+    function displayProfile(profile) {
+      const displayDiv = document.getElementById('profile-display');
+      displayDiv.innerHTML = `
+        <div class="profile-field">
+          <strong>Username:</strong>
+          <span>${profile.username || 'N/A'}</span>
+        </div>
+        <div class="profile-field">
+          <strong>Full Name:</strong>
+          <span>${profile.fullName || 'Not set'}</span>
+        </div>
+        <div class="profile-field">
+          <strong>Email:</strong>
+          <span>${profile.email || 'Not set'}</span>
+        </div>
+        <div class="profile-field">
+          <strong>Phone Number:</strong>
+          <span>${profile.phoneNumber || 'Not set'}</span>
+        </div>
+        <div class="profile-field">
+          <strong>Delivery Address:</strong>
+          <span>${profile.deliveryAddress || 'Not set'}</span>
+        </div>
+        <div class="profile-field">
+          <strong>Permanent Address:</strong>
+          <span>${profile.permanentAddress || 'Not set'}</span>
+        </div>
+      `;
+
+      // Fill edit form
+      document.getElementById('edit-username').value = profile.username || '';
+      document.getElementById('edit-fullname').value = profile.fullName || '';
+      document.getElementById('edit-email').value = profile.email || '';
+      document.getElementById('edit-phone').value = profile.phoneNumber || '';
+      document.getElementById('edit-delivery').value = profile.deliveryAddress || '';
+      document.getElementById('edit-permanent').value = profile.permanentAddress || '';
+    }
+
+    // Toggle edit profile
+    function toggleEditProfile() {
+      const form = document.getElementById('profile-edit-form');
+      const btn = document.getElementById('edit-profile-btn');
+      const display = document.getElementById('profile-display');
+      
+      if (form.style.display === 'none') {
+        form.style.display = 'block';
+        display.style.display = 'none';
+        btn.textContent = 'Cancel Edit';
+      } else {
+        form.style.display = 'none';
+        display.style.display = 'block';
+        btn.textContent = 'Edit Profile';
+        document.getElementById('profile-edit-form').reset();
+        loadProfile();
+      }
+    }
+
+    // Profile edit form submission
+    document.getElementById('profile-edit-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const profileData = {
+        username: formData.get('username'),
+        fullName: formData.get('fullName'),
+        email: formData.get('email'),
+        phoneNumber: formData.get('phoneNumber'),
+        deliveryAddress: formData.get('deliveryAddress'),
+        permanentAddress: formData.get('permanentAddress')
+      };
+
+      // Only include password if provided
+      const password = formData.get('password');
+      if (password) {
+        profileData.password = password;
+      }
+
+      const username = UserManager.getCurrentUsername();
+      const errorDiv = document.getElementById('profile-error');
+      const successDiv = document.getElementById('profile-success');
+
+      errorDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+
+      const result = await UserManager.updateProfile(username, profileData);
+
+      if (result.success) {
+        successDiv.textContent = 'Profile updated successfully!';
+        successDiv.style.display = 'block';
+        toggleEditProfile();
+        await loadProfile();
+      } else {
+        errorDiv.textContent = result.message;
+        errorDiv.style.display = 'block';
+      }
+    });
+
+    // Logout
+    function logout() {
+      UserManager.logout();
+      document.getElementById('profile-section').style.display = 'none';
+      document.getElementById('auth-section').style.display = 'block';
+      document.getElementById('admin-users-section').style.display = 'none';
+      switchTab('login');
+    }
+
+    // Load all users (admin only)
+    async function loadAllUsers() {
+      if (!AuthManager.isAuthenticated()) return;
+
+      try {
+        const users = await UserManager.getAllUsers();
+        const usersList = document.getElementById('users-list');
+        usersList.innerHTML = '';
+
+        if (users.length === 0) {
+          usersList.innerHTML = '<p>No users found.</p>';
+          return;
+        }
+
+        users.forEach(user => {
+          const userItem = document.createElement('div');
+          userItem.className = 'user-item';
+          userItem.innerHTML = `
+            <div class="user-item-info">
+              <h4>${user.username}</h4>
+              <p>${user.fullName || 'No name'} | ${user.email || 'No email'}</p>
+            </div>
+            <div>
+              <button class="btn btn-ghost" onclick="editUserProfile('${user.username}')">Edit</button>
+            </div>
+          `;
+          usersList.appendChild(userItem);
+        });
+
+        document.getElementById('admin-users-section').style.display = 'block';
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    }
+
+    // Edit user profile (admin)
+    async function editUserProfile(username) {
+      try {
+        const profile = await UserManager.getProfile(username);
+        // For now, we'll use an alert to show the edit form
+        // In a full implementation, you'd show a modal or navigate to an edit page
+        const newFullName = prompt('Enter full name:', profile.fullName || '');
+        if (newFullName === null) return;
+
+        const newEmail = prompt('Enter email:', profile.email || '');
+        if (newEmail === null) return;
+
+        const result = await UserManager.updateProfile(username, {
+          fullName: newFullName,
+          email: newEmail
+        });
+
+        if (result.success) {
+          alert('User profile updated successfully!');
+          loadAllUsers();
+        } else {
+          alert('Error updating profile: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error editing user:', error);
+        alert('Error loading user profile');
+      }
+    }
+  </script>
+</body>
+</html>
+

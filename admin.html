@@ -35,7 +35,7 @@
           <div id="login-error" style="color:#ef4444; margin-top:10px; display:none;"></div>
         </form>
         <p style="text-align:center; margin-top:20px; color:var(--muted); font-size:14px;">
-          Don't have an account? <a href="#" onclick="showRegister()" style="color:var(--brand-primary);">Register</a>
+          Default credentials: admin / adminsData
         </p>
       </div>
     </div>
@@ -127,30 +127,7 @@
       loadProducts();
     }
 
-    let isRegisterMode = false;
-
-    // Show register form
-    function showRegister() {
-      const form = document.getElementById('login-form');
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const errorDiv = document.getElementById('login-error');
-      
-      if (!isRegisterMode) {
-        isRegisterMode = true;
-        submitBtn.textContent = 'Register';
-        form.querySelector('label[for="userid"]').textContent = 'User ID (for registration) *';
-        errorDiv.textContent = 'Register a new admin account';
-        errorDiv.style.display = 'block';
-        errorDiv.style.color = 'var(--brand-primary)';
-      } else {
-        isRegisterMode = false;
-        submitBtn.textContent = 'Login';
-        form.querySelector('label[for="userid"]').textContent = 'User ID *';
-        errorDiv.style.display = 'none';
-      }
-    }
-
-    // Handle form submission (login or register)
+    // Handle form submission (login only)
     document.getElementById('login-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const userid = document.getElementById('userid').value;
@@ -159,32 +136,15 @@
       
       errorDiv.style.display = 'none';
       
-      if (isRegisterMode) {
-        // Handle registration
-        const result = await AuthManager.register(userid, password);
-        
-        if (result.success) {
-          errorDiv.textContent = 'Registration successful! Please login.';
-          errorDiv.style.display = 'block';
-          errorDiv.style.color = 'var(--brand-accent)';
-          showRegister(); // Switch back to login mode
-          this.reset();
-        } else {
-          errorDiv.textContent = result.message;
-          errorDiv.style.display = 'block';
-          errorDiv.style.color = '#ef4444';
-        }
+      // Handle login
+      const result = await AuthManager.login(userid, password);
+      
+      if (result.success) {
+        showAdminPanel();
       } else {
-        // Handle login
-        const result = await AuthManager.login(userid, password);
-        
-        if (result.success) {
-          showAdminPanel();
-        } else {
-          errorDiv.textContent = result.message;
-          errorDiv.style.display = 'block';
-          errorDiv.style.color = '#ef4444';
-        }
+        errorDiv.textContent = result.message;
+        errorDiv.style.display = 'block';
+        errorDiv.style.color = '#ef4444';
       }
     });
 

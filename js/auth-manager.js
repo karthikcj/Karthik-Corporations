@@ -2,7 +2,7 @@
 // Handles admin authentication with MongoDB and localStorage fallback
 
 const AuthManager = {
-  API_URL: 'http://localhost:5000/api/admin',
+  API_URL: '/api/admin',
   AUTH_KEY: 'karthik_admin_auth',
   ADMIN_KEY: 'karthik_admin_users',
 
@@ -10,7 +10,7 @@ const AuthManager = {
   async login(userid, password) {
     try {
       // Try server first
-      const response = await fetch(`${this.API_URL}/login`, {
+      const response = await fetch(`${this.API_URL}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -29,13 +29,20 @@ const AuthManager = {
       }
     } catch (error) {
       console.log('Server unavailable, checking localStorage:', error);
-      // Fallback to localStorage
+      // Fallback to localStorage (check for default admin)
       return this.loginLocalStorage(userid, password);
     }
   },
 
-  // Login from localStorage
+  // Login from localStorage (fallback - checks default admin credentials)
   loginLocalStorage(userid, password) {
+    // Check default admin credentials
+    if (userid === 'admin' && password === 'adminsData') {
+      this.saveAuth({ userid, isAuthenticated: true, timestamp: Date.now() });
+      return { success: true, message: 'Login successful (offline mode)' };
+    }
+    
+    // Also check stored admins for backward compatibility
     const admins = this.getLocalAdmins();
     const admin = admins.find(a => a.userid === userid && a.password === password);
     
@@ -45,34 +52,6 @@ const AuthManager = {
     }
     
     return { success: false, message: 'Invalid credentials' };
-  },
-
-  // Register admin (for initial setup)
-  async register(userid, password) {
-    try {
-      const response = await fetch(`${this.API_URL}/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ userid, password })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Also save to localStorage
-        this.addLocalAdmin(userid, password);
-        return { success: true, message: data.message };
-      } else {
-        const error = await response.json();
-        return { success: false, message: error.error || 'Registration failed' };
-      }
-    } catch (error) {
-      console.log('Server unavailable, saving to localStorage:', error);
-      // Fallback to localStorage
-      this.addLocalAdmin(userid, password);
-      return { success: true, message: 'Admin registered (offline mode)' };
-    }
   },
 
   // Check if user is authenticated

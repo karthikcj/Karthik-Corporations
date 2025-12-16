@@ -2,7 +2,7 @@
 // Handles product CRUD operations with server sync fallback
 
 const ProductManager = {
-  API_URL: 'http://localhost:5000/api/products',
+  API_URL: '/api/products',
 
   // Load products from server or localStorage
   async loadProducts() {
