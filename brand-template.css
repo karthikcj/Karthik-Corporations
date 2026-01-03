@@ -195,6 +195,9 @@ body{
   cursor:pointer;
   border:none;
 }
+.Out-of-stock .text{
+  color: #dc2626;
+}
 
 /* Cart UI */
 .cart-link{

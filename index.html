@@ -93,6 +93,7 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+    
     function animateProducts() {
       const productCards = document.querySelectorAll('.card');
       productCards.forEach((card, index) => {
@@ -106,8 +107,8 @@
       });
     }
 
-    // Load and animate products
-    fetchProducts().then(animateProducts);
+    // Animate products on page load
+    animateProducts();
   </script>
 </body>
 </html>
