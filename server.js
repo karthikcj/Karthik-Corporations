@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json()); // Parse JSON bodies
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/brandDB')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://karthiksuperrockdon1_db_user:i5NvOMBH43F5yGTH@cluster1129.vhwleca.mongodb.net/brandDB?appName=Cluster1129')
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
 

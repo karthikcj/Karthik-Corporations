@@ -17,8 +17,8 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/brandDB';
-    
+    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://karthiksuperrockdon1_db_user:i5NvOMBH43F5yGTH@cluster1129.vhwleca.mongodb.net/brandDB?appName=Cluster1129';
+    //mongodb+srv://<db_username>:i5NvOMBH43F5yGTH@cluster1129.vhwleca.mongodb.net/?appName=Cluster1129
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       return mongoose;
     });
